@@ -37,7 +37,7 @@ class PurchaseOrder(models.Model):
     po_number = models.CharField(max_length=50, unique=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
-    delivery_date = models.DateTimeField()
+    delivery_date = models.DateField()
     items = models.JSONField()
     quantity = models.IntegerField()
     STATUS_CHOICES = [
@@ -80,26 +80,33 @@ class HistoricalPerformance(models.Model):
     fulfillment_rate = models.FloatField(null=True, blank=True)
 
     def calculate_and_save_metrics(self):
+        # Retrieve completed purchase orders for the vendor
         completed_pos = PurchaseOrder.objects.filter(vendor=self.vendor, status='completed')
         total_completed_pos = completed_pos.count()
 
+        # Calculate on-time delivery rate
         on_time_deliveries = completed_pos.filter(status_date__lte=F('delivery_date'))
-        on_time_delivery_rate = on_time_deliveries.count() / completed_pos.count() if completed_pos.count() > 0 else 0
+        on_time_delivery_rate = on_time_deliveries.count() / total_completed_pos if total_completed_pos > 0 else 0
 
+        # Calculate average quality rating
         quality_rating_avg = completed_pos.aggregate(avg_quality_rating=Avg('quality_rating'))['avg_quality_rating'] or 0
 
+        # Calculate average response time
         acknowledged_pos = completed_pos.exclude(acknowledgment_date=None)
         avg_response_time = acknowledged_pos.aggregate(avg_response_time=Avg(F('acknowledgment_date') - F('issue_date')))['avg_response_time'] or 0
 
+        # Calculate fulfillment rate
         successful_fulfillments = completed_pos.filter(acknowledgment_date__isnull=False, issue_date__lte=timezone.now())
-        fulfillment_rate = successful_fulfillments.count() / completed_pos.count() if completed_pos.count() > 0 else 0
+        fulfillment_rate = successful_fulfillments.count() / total_completed_pos if total_completed_pos > 0 else 0
 
+        # Update the historical performance metrics
         self.on_time_delivery_rate = on_time_delivery_rate
         self.quality_rating_avg = quality_rating_avg
         self.average_response_time = avg_response_time
         self.fulfillment_rate = fulfillment_rate
 
+        # Save the updated metrics
         self.save()
 
     def __str__(self):
-        return f"History {self.vendor.name}"
+        return f"Historical Performance for {self.vendor.name}"
