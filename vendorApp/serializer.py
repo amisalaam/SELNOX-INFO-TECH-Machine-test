@@ -17,7 +17,7 @@ class AllVendorSerializers(serializers.ModelSerializer):
 class PoCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseOrder
-        fields = ('id','vendor','delivery_date','items','quantity')
+        fields = ['id','vendor','delivery_date','items','quantity']
 
 
 class AllPurachaseOrderSerilizer(serializers.ModelSerializer):
@@ -26,7 +26,7 @@ class AllPurachaseOrderSerilizer(serializers.ModelSerializer):
         exclude = ['po_number']
 
 
-class PerfomanceMetricsSerializer(serializers.ModelSerializer):
+class PerformanceMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = HistoricalPerformance
         fields = '__all__'
