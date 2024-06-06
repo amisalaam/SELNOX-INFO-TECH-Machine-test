@@ -24,8 +24,8 @@ The Vendor Management System (VMS) helps manage vendor information, purchase ord
 
 ## 1. Clone the repository:
 
-     git clone https://github.com/yourusername/vms.git
-     cd vms
+     [git clone https://github.com/yourusername/vms.git](https://github.com/amisalaam/SELNOX-INFO-TECH-Machine-test.git)
+     
    
 ## 2. Create and activate a virtual environment:
      python -m venv venv
