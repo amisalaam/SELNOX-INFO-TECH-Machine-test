@@ -42,8 +42,7 @@ INSTALLED_APPS = [
     'vendorApp',
     
     #Installed apps
-    'rest_framework',
-    
+    'rest_framework',  
     'drf_yasg',
 ]
 
